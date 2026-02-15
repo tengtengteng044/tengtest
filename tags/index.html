@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en" loading="lazy">
 <head loading="lazy">
@@ -7,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://adabunalima5.github.io/file/css/01/01.css"/> 
   
-  <link rel="icon" type="image/png" sizes="32x32" href="https://nengmaya538.github.io/favicon.png" />
-  <link rel="shortcut icon" href="https://nengmaya538.github.io/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="https://nengmaya538.github.io/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <meta name="theme-color" content="#317EFB" />
 
   <!-- Preload untuk optimasi kecepatan -->
@@ -126,7 +125,7 @@
         { property: 'og:description', content: tagName + ' - photo, video, and contents' },
         { property: 'og:url', content: location.href },
         { property: 'og:type', content: 'website' },
-        { property: 'og:image', content: 'https://nengmaya538.github.io/photo/fallback.png' },
+        { property: 'og:image', content: location.origin + '/photo/fallback.png' },
         { property: 'og:site_name', content: subdomain },
         { property: 'article:tag', content: tagName }
       ];
@@ -143,7 +142,7 @@
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: tagName },
         { name: 'twitter:description', content: tagName + ' - photo, video, and contents' },
-        { name: 'twitter:image', content: 'https://nengmaya538.github.io/photo/fallback.png' }
+        { name: 'twitter:image', content: location.origin + '/photo/fallback.png' }
       ];
       
       twitterTags.forEach(tag => {
@@ -170,7 +169,16 @@
   </script>
   <!-- akhir Seo Otomatis -->
 
-  
+  <link rel="sitemap" type="application/xml" href="" id="sitemap-main">
+  <link rel="alternate" type="application/rss+xml" href="" id="sitemap-feed">
+
+  <script>
+  (function() {
+    var origin = window.location.origin;
+    document.getElementById("sitemap-main").href = origin + "/sitemap.xml";
+    document.getElementById("sitemap-feed").href = origin + "/feed.xml";
+  })();
+  </script>	
 
   <script src="https://unpkg.com/elasticlunr/elasticlunr.js"></script>
 </head>
@@ -392,9 +400,9 @@ main, .content { margin-top: 20px !important; }
 <div id="blogMenuPanel">
   <ul>
     <li><a href="/">Home</a></li>
-    <li><a href="https://nengmaya538.github.io/contact/">Contact</a></li>
-    <li><a href="https://nengmaya538.github.io/privacy-policy/">Privacy Policy</a></li>
-    <li><a href="https://nengmaya538.github.io/terms-and-conditions/">Terms & Conditions</a></li>
+    <li><a href="/contact/">Contact</a></li>
+    <li><a href="/privacy-policy/">Privacy Policy</a></li>
+    <li><a href="/terms-and-conditions/">Terms & Conditions</a></li>
   </ul>
 </div>
 
@@ -933,7 +941,7 @@ async function runTags() {
   }
 
   try {
-    // 1. Fetch data dari search.json
+    // 1. Fetch data dari search.json (Sumber diubah)
     const response = await fetch("https://nengmaya538.github.io/search.json");
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const allPosts = await response.json();
@@ -1012,7 +1020,8 @@ function displayTagResults(results, keyword, container, currentPage, totalPages,
     // Format judul dengan keyword di awal
     const originalTitle = post.title || 'Untitled Post';
     const formattedTitle = formatTitleWithKeyword(originalTitle, keyword);
-    const postURL = post.url || '#';
+    // Link postingan diubah
+    const postURL = post.url ? post.url.replace(/^https?:\/\/[^\/]+/, 'https://nengmaya538.github.io') : 'https://nengmaya538.github.io/';
     
     // Buat snippet dari content dengan keyword highlighted
     let snippet = '';
@@ -1034,13 +1043,15 @@ function displayTagResults(results, keyword, container, currentPage, totalPages,
     
     // ALT IMG: HANYA keyword saja
     const altText = escapeHtml(keyword);
+    // Link gambar diubah
+    const imageUrl = post.image ? post.image.replace(/^https?:\/\/[^\/]+/, 'https://nengmaya538.github.io') : 'https://nengmaya538.github.io/photo/fallback.png';
     
     return `
       <div class="tags-result">
         <h3><a href="${postURL}">${escapeHtml(formattedTitle)}</a></h3>
         <div style="margin-bottom: 10px;">
           <a href="${postURL}">
-            <img src="https://nengmaya538.github.io/photo/fallback.png" 
+            <img src="${imageUrl}" 
                  alt="${altText}"
                  title="${escapeHtml(keyword)} content"
                  loading="lazy" 
@@ -1076,6 +1087,7 @@ function displayTagResults(results, keyword, container, currentPage, totalPages,
 // Fungsi: Load random posts
 async function loadRandomPosts(container, count = 9, keyword = '') {
   try {
+    // Sumber random posts juga diubah
     const response = await fetch("https://nengmaya538.github.io/posts-acak.json");
     if (!response.ok) throw new Error(`Failed to load random posts`);
     
@@ -1090,19 +1102,22 @@ async function loadRandomPosts(container, count = 9, keyword = '') {
     const randomPosts = shuffledPosts.slice(0, Math.min(count, allPosts.length));
     
     const randomPostsHTML = randomPosts.map(post => {
-      const postURL = post.url || '#';
+      // Link postingan diubah
+      const postURL = post.url ? post.url.replace(/^https?:\/\/[^\/]+/, 'https://nengmaya538.github.io') : 'https://nengmaya538.github.io/';
       const originalTitle = post.title || 'Untitled Post';
       const formattedTitle = keyword ? formatTitleWithKeyword(originalTitle, keyword) : originalTitle;
       const excerpt = post.excerpt || post.content?.substring(0, 150) || '';
       
       // ALT IMG: HANYA keyword atau default
       const altText = keyword ? escapeHtml(keyword) : "random posts";
+      // Link gambar diubah
+      const imageUrl = post.image ? post.image.replace(/^https?:\/\/[^\/]+/, 'https://nengmaya538.github.io') : 'https://nengmaya538.github.io/photo/fallback.png';
       
       return `
         <div class="random-post">
           <div style="margin-bottom: 10px;">
             <a href="${postURL}">
-              <img src="https://nengmaya538.github.io/photo/fallback.png" 
+              <img src="${imageUrl}" 
                    alt="${altText}"
                    title="${keyword ? escapeHtml(keyword) + ' content' : 'random posts'}"
                    loading="lazy" 
@@ -1160,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Update semua link tag di situs untuk menggunakan format baru
   setTimeout(() => {
-    document.querySelectorAll('a[href*="https://nengmaya538.github.io/tags/"]').forEach(link => {
+    document.querySelectorAll('a[href*="/tags/"]').forEach(link => {
       const href = link.getAttribute('href');
       
       // Jika link menggunakan format /tags/keyword (tanpa query)

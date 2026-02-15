@@ -1040,7 +1040,7 @@ function displayTagResults(results, keyword, container, currentPage, totalPages,
         <h3><a href="${postURL}">${escapeHtml(formattedTitle)}</a></h3>
         <div style="margin-bottom: 10px;">
           <a href="${postURL}">
-            <img src="/photo/fallback.png" 
+            <img src="https://nengmaya538.github.io/photo/fallback.png" 
                  alt="${altText}"
                  title="${escapeHtml(keyword)} content"
                  loading="lazy" 
@@ -1160,7 +1160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Update semua link tag di situs untuk menggunakan format baru
   setTimeout(() => {
-    document.querySelectorAll('a[href*="/tags/"]').forEach(link => {
+    document.querySelectorAll('a[href*="https://nengmaya538.github.io/tags/"]').forEach(link => {
       const href = link.getAttribute('href');
       
       // Jika link menggunakan format /tags/keyword (tanpa query)

@@ -608,62 +608,58 @@
   </script>
   <!-- akhir Seo Otomatis -->
 <main loading="lazy">
- <div id="random-sections"></div>
-<script>
+<!--indri--> <div id="random-sections"></div>
+ <script>
 (function () {
 
   function clean(str) {
     if (!str) return "";
-    return str
-      .replace(/\t/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
+    return str.replace(/\t/g, "")
+              .replace(/\s+/g, " ")
+              .trim();
   }
 
   function normalizeUrl(url) {
     url = clean(url);
-    return url
-      .replace(/^http:\/\//i, "https://")  // paksa https
-      .replace(/\s/g, "");                 // hapus spasi dalam url
+    return url.replace(/\s/g, "");
   }
 
-  fetch("/includes.json?v=" + Date.now(), { cache: "no-store" })
-    .then(res => res.json())
+  fetch("/includes.json")
+    .then(response => {
+      if (!response.ok) throw new Error("JSON gagal dimuat");
+      return response.json();
+    })
     .then(data => {
 
-      if (!Array.isArray(data) || !data.length) return;
+      if (!Array.isArray(data)) return;
 
-      // Bersihkan data
+      // bersihkan data
       data = data.map(item => ({
         url: normalizeUrl(item.url),
         text: clean(item.text)
       })).filter(item => item.url && item.text);
 
-      // Random shuffle
-      for (let i = data.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [data[i], data[j]] = [data[j], data[i]];
-      }
+      // random
+      data.sort(() => Math.random() - 0.5);
 
       let container = document.getElementById("random-sections");
-      let sectionCount = Math.ceil(data.length / 10);
 
-      for (let s = 0; s < sectionCount; s++) {
+      let section = document.createElement("div");
+      section.className = "spo";
 
-        let section = document.createElement("div");
-        section.className = "spo";
+      let slice = data.slice(0, 10);
 
-        let slice = data.slice(s * 10, (s + 1) * 10);
+      section.innerHTML = slice.map(item =>
+        `<a href="${item.url}">${item.text}</a><br>`
+      ).join("");
 
-        section.innerHTML = slice.map(item => {
-          return `<a href="${item.url}">${item.text}</a><br>`;
-        }).join("");
-
-        container.appendChild(section);
-      }
+      container.innerHTML = "";
+      container.appendChild(section);
 
     })
-    .catch(err => console.error("Error:", err));
+    .catch(error => {
+      console.log("Error:", error);
+    });
 
 })();
 </script>

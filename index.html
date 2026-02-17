@@ -608,46 +608,62 @@
   </script>
   <!-- akhir Seo Otomatis -->
 <main loading="lazy">
- 
-<div id="random-sections"></div>
-
+ <div id="random-sections"></div>
 <script>
-(async function () {
+(function () {
 
-  const container = document.getElementById("random-sections");
-  if (!container) return;
-
-  try {
-
-    const res = await fetch("/includes.json?v=" + Date.now(), {
-      cache: "no-store"
-    });
-
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) return;
-
-    // shuffle
-    const shuffled = data.sort(() => 0.5 - Math.random());
-
-    const chunkSize = 10;
-
-    for (let i = 0; i < shuffled.length; i += chunkSize) {
-
-      const sectionData = shuffled.slice(i, i + chunkSize);
-
-      const section = document.createElement("div");
-      section.className = "random-section";
-
-      section.innerHTML = sectionData.map(item =>
-        `<a href="${item.url}">${item.text}</a><br>`
-      ).join("");
-
-      container.appendChild(section);
-    }
-
-  } catch (err) {
-    console.error("Random section error:", err);
+  function clean(str) {
+    if (!str) return "";
+    return str
+      .replace(/\t/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
   }
+
+  function normalizeUrl(url) {
+    url = clean(url);
+    return url
+      .replace(/^http:\/\//i, "https://")  // paksa https
+      .replace(/\s/g, "");                 // hapus spasi dalam url
+  }
+
+  fetch("/includes.json?v=" + Date.now(), { cache: "no-store" })
+    .then(res => res.json())
+    .then(data => {
+
+      if (!Array.isArray(data) || !data.length) return;
+
+      // Bersihkan data
+      data = data.map(item => ({
+        url: normalizeUrl(item.url),
+        text: clean(item.text)
+      })).filter(item => item.url && item.text);
+
+      // Random shuffle
+      for (let i = data.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [data[i], data[j]] = [data[j], data[i]];
+      }
+
+      let container = document.getElementById("random-sections");
+      let sectionCount = Math.ceil(data.length / 10);
+
+      for (let s = 0; s < sectionCount; s++) {
+
+        let section = document.createElement("div");
+        section.className = "spo";
+
+        let slice = data.slice(s * 10, (s + 1) * 10);
+
+        section.innerHTML = slice.map(item => {
+          return `<a href="${item.url}">${item.text}</a><br>`;
+        }).join("");
+
+        container.appendChild(section);
+      }
+
+    })
+    .catch(err => console.error("Error:", err));
 
 })();
 </script>
